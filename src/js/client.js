@@ -77,8 +77,11 @@ const renderCasilla = ({
     celda,
     iFila,
     iColumna,
+    root,
+    APP_STATE,
     size = 50,
 }) => {
+    const {Turn, Board} = APP_STATE;
     const casilla = document.createElement('button');
     casilla.style.width = `${size}px`;
     casilla.style.height = `${size}px`;
@@ -97,6 +100,22 @@ const renderCasilla = ({
         ficha.style.backgroundColor = '#FFFFFF';
         ficha.style.borderRadius = `${size/2}px`;
         casilla.appendChild(ficha);
+    }
+    if (celda === 0){
+        casilla.onclick = () => {
+            if (Turn){
+                Board[iFila][iColumna] = 1;
+                APP_STATE.Turn = !Turn;
+                root.innerHTML = '';
+                render(root, APP_STATE);
+            }
+            else if (!Turn){
+                Board[iFila][iColumna] = -1;
+                APP_STATE.Turn = !Turn;
+                root.innerHTML = '';
+                render(root, APP_STATE);
+            }
+        }
     }
     return casilla;
 }
@@ -203,7 +222,7 @@ const render = (mount, state) => {
     tablero.style.padding = '25px';
     tablero.style.borderRadius = '5px';
 
-    state.Board.map((fila, iFila) => fila.map((celda, iColumna) => renderCasilla({celda, iFila, iColumna})).forEach(casilla => tablero.appendChild(casilla)));
+    state.Board.map((fila, iFila) => fila.map((celda, iColumna) => renderCasilla({celda, iFila, iColumna, root, APP_STATE})).forEach(casilla => tablero.appendChild(casilla)));
     
     info.appendChild(tablero);
     mount.appendChild(info);
