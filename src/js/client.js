@@ -6,6 +6,7 @@
     Carne: 18607
     Fecha: 30/01/2020   
 */
+
 /*const renderLuz = ({
     color,
     size = 200,
@@ -72,7 +73,9 @@ render(root, APP_STATE);*/
 
 */
 
+const revisar = function ({Board, row, column, positions}){
 
+}
 const renderCasilla = ({
     celda,
     iFila,
@@ -82,25 +85,29 @@ const renderCasilla = ({
     size = 50,
 }) => {
     const {Turn, Board} = APP_STATE;
+    //Crea la casilla
     const casilla = document.createElement('button');
     casilla.style.width = `${size}px`;
     casilla.style.height = `${size}px`;
     casilla.style.borderColor = '#000000';
-    casilla.style.backgroundColor = '#317520';
+    casilla.style.backgroundColor = '#00b75b';
     casilla.style.borderRadius = `${size/10}px`;
     const ficha = document.createElement('div');
     ficha.style.width = `${size-15}px`;
     ficha.style.height = `${size-15}px`;
+    //Le da el estilo correspondiente si esta posicionada una ficha blanca
     if(celda === 1){
         ficha.style.backgroundColor = '#000000';
         ficha.style.borderRadius = `${size/2}px`;
         casilla.appendChild(ficha);
     }
+    //Le da el estilo correspondiente si esta posicionada una ficha negra
     if(celda === -1){
         ficha.style.backgroundColor = '#FFFFFF';
         ficha.style.borderRadius = `${size/2}px`;
         casilla.appendChild(ficha);
     }
+    //Si esta vacia y el usuario presiona esa casilla
     if (celda === 0){
         casilla.onclick = () => {
             if (Turn){
@@ -125,7 +132,7 @@ const render = (mount, state) => {
 
     const { Turn, Board} = state;
 
-    mount.style.backgroundColor = '#805353';
+    mount.style.backgroundColor = '#ecd67b';
     mount.style.padding = '25px';
 
     const info = document.createElement('div');
@@ -134,6 +141,7 @@ const render = (mount, state) => {
     info.style.flexDirection = 'column';
     info.style.alignItems = 'center';
 
+    //Titulo
     const title = document.createElement('h1');
     title.innerText = 'Play Othello';
     title.style.fontSize = '48px';
@@ -144,10 +152,11 @@ const render = (mount, state) => {
     state_game.display = 'flex';
     state_game.style.flexDirection = 'row';
     state_game.style.alignItems = 'center';
-    state_game.style.backgroundColor = '#805353';
+    state_game.style.backgroundColor = '#ecd67b';
     state_game.style.borderStyle = 'dashed';
     state_game.style.borderSize = '2px';
 
+    //Cuenta la cantidad de fichas de cada color
     let cuenta_blancas = 0;
     let cuenta_negras = 0;
 
@@ -160,6 +169,7 @@ const render = (mount, state) => {
         }
     }));
 
+    //Muestra la cantidad de fichas por color
     const state_white = document.createElement('div');
     state_white.style.padding = '5px';
     state_white.style.display = 'flex';
@@ -186,6 +196,7 @@ const render = (mount, state) => {
     c_blacks.style.paddingLeft = '5px';
     blacks.style.paddingLeft = '75px';
 
+    //Muestra el turno del jugador
     const info_turno = document.createElement('div');
     info_turno.style.alignItems = 'center';
     info_turno.style.display = 'flex';
@@ -213,10 +224,9 @@ const render = (mount, state) => {
     info.appendChild(title);
     info.appendChild(state_game);
 
-
-    
+    //Muestra el tablero
     const tablero = document.createElement('div');
-    tablero.style.backgroundColor = '#317520';
+    tablero.style.backgroundColor = '#00b75b';
     tablero.style.width = '410px';
     tablero.style.margin = '10px';
     tablero.style.padding = '25px';
@@ -226,6 +236,7 @@ const render = (mount, state) => {
     
     info.appendChild(tablero);
     mount.appendChild(info);
+    
 };
 
 const APP_STATE = {
