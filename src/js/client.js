@@ -73,67 +73,78 @@ render(root, APP_STATE);*/
 
 */
 
-const revisar = function ({Board, row, column, positions}){
-
-}
-const renderCasilla = ({
-    celda,
-    iFila,
-    iColumna,
-    root,
-    APP_STATE,
-    size = 50,
-}) => {
-    const {Turn, Board} = APP_STATE;
-    //Crea la casilla
-    const casilla = document.createElement('button');
-    casilla.style.width = `${size}px`;
-    casilla.style.height = `${size}px`;
-    casilla.style.borderColor = '#000000';
-    casilla.style.backgroundColor = '#00b75b';
-    casilla.style.borderRadius = `${size/10}px`;
-    const ficha = document.createElement('div');
-    ficha.style.width = `${size-15}px`;
-    ficha.style.height = `${size-15}px`;
-    //Le da el estilo correspondiente si esta posicionada una ficha blanca
-    if(celda === 1){
-        ficha.style.backgroundColor = '#000000';
-        ficha.style.borderRadius = `${size/2}px`;
-        casilla.appendChild(ficha);
-    }
-    //Le da el estilo correspondiente si esta posicionada una ficha negra
-    if(celda === -1){
-        ficha.style.backgroundColor = '#FFFFFF';
-        ficha.style.borderRadius = `${size/2}px`;
-        casilla.appendChild(ficha);
-    }
-    //Si esta vacia y el usuario presiona esa casilla
-    if (celda === 0){
-        casilla.onclick = () => {
-            if (Turn){
-                Board[iFila][iColumna] = 1;
-                APP_STATE.Turn = !Turn;
-                root.innerHTML = '';
-                render(root, APP_STATE);
-            }
-            else if (!Turn){
-                Board[iFila][iColumna] = -1;
-                APP_STATE.Turn = !Turn;
-                root.innerHTML = '';
-                render(root, APP_STATE);
-            }
-        }
-    }
-    return casilla;
-}
-    
-
 const render = (mount, state) => {
 
     const { Turn, Board} = state;
 
     mount.style.backgroundColor = '#ecd67b';
     mount.style.padding = '25px';
+
+
+    const vertical = (
+    {celda, 
+    indice,}) => {
+        let i_final;
+        for (const i=indice; i<64; i+8){
+            if (state.Board[indice]===celda){
+                console.log(i);
+                i_final=i;
+            }
+        }
+        for (const e=indice; e<i_final; e+8){
+            state.Board[e]=celda;
+        }
+    }
+
+
+    const renderCasilla = ({
+        celda,
+        indice,
+        size = 50,
+    }) => {
+        //Crea la casilla
+        const casilla = document.createElement('button');
+        casilla.style.width = `${size}px`;
+        casilla.style.height = `${size}px`;
+        casilla.style.borderColor = '#000000';
+        casilla.style.backgroundColor = '#00b75b';
+        casilla.style.borderRadius = `${size/10}px`;
+        const ficha = document.createElement('div');
+        ficha.style.width = `${size-15}px`;
+        ficha.style.height = `${size-15}px`;
+        //Le da el estilo correspondiente si esta posicionada una ficha blanca
+        if(celda === 1){
+            ficha.style.backgroundColor = '#000000';
+            ficha.style.borderRadius = `${size/2}px`;
+            casilla.appendChild(ficha);
+        }
+        //Le da el estilo correspondiente si esta posicionada una ficha negra
+        if(celda === -1){
+            ficha.style.backgroundColor = '#FFFFFF';
+            ficha.style.borderRadius = `${size/2}px`;
+            casilla.appendChild(ficha);
+        }
+        //Si esta vacia y el usuario presiona esa casilla
+        if (celda === 0){
+            casilla.onclick = () => {
+                if (Turn){
+                    APP_STATE.Board[indice] = 1;
+                    APP_STATE.Turn = !Turn;
+                    vertical({celda: 1, indice});
+                    root.innerHTML = '';
+                    render(root, APP_STATE);
+                }
+                else if (!Turn){
+                    APP_STATE.Board[indice] = -1;
+                    APP_STATE.Turn = !Turn;
+                    vertical({celda: -1, indice});
+                    root.innerHTML = '';
+                    render(root, APP_STATE);
+                }
+            }
+        }
+        return casilla;
+    }
 
     const info = document.createElement('div');
     info.style.minWidth = '410px';
@@ -142,25 +153,19 @@ const render = (mount, state) => {
     info.style.alignItems = 'center';
 
     //Titulo
-    const title = document.createElement('h1');
-    title.innerText = 'Play Othello';
-    title.style.fontSize = '48px';
-    title.style.fontFamily= 'sans-serif';
-
-    const state_game = document.createElement('div');
-    state_game.style.minWidth = '410px';
-    state_game.display = 'flex';
-    state_game.style.flexDirection = 'row';
-    state_game.style.alignItems = 'center';
-    state_game.style.backgroundColor = '#ecd67b';
-    state_game.style.borderStyle = 'dashed';
-    state_game.style.borderSize = '2px';
-
+    const render_titulo = () =>{
+        const title = document.createElement('h1');
+        title.innerText = 'Play Othello';
+        title.style.fontSize = '48px';
+        title.style.fontFamily= 'sans-serif';
+        return title;
+    }
+    
     //Cuenta la cantidad de fichas de cada color
     let cuenta_blancas = 0;
     let cuenta_negras = 0;
 
-    state.Board.map((fila, iFila) => fila.map((celda, iColumna) => {
+    state.Board.map(((celda, indice) => {
         if (celda === -1){
             cuenta_blancas += 1;
         }
@@ -169,72 +174,95 @@ const render = (mount, state) => {
         }
     }));
 
+    const render_estado_whites = () =>{
+       const state_white = document.createElement('div');
+        state_white.style.display = 'flex';
+        state_white.style.flexDirection = 'row';
+        const whites = document.createElement('h3');
+        whites.innerText = "Cant. Blancas:"
+        const c_whites = document.createElement('h3');
+        c_whites.innerText = cuenta_blancas;
+        c_whites.style.paddingLeft = '5px';
+        whites.style.paddingLeft = '25px';
+
+        state_white.appendChild(whites);
+        state_white.appendChild(c_whites); 
+        return state_white;
+    }
+    
+    const render_estado_blacks = () =>{
+       const state_black = document.createElement('div');
+        state_black.style.display = 'flex';
+        state_black.style.flexDirection = 'row';
+        const blacks = document.createElement('h3');
+        blacks.innerText = "Cant. Negras:"
+        const c_blacks = document.createElement('h3');
+        c_blacks.innerText = cuenta_negras;
+        c_blacks.style.paddingLeft = '5px';
+        blacks.style.paddingLeft = '25px';
+
+        state_black.appendChild(blacks);
+        state_black.appendChild(c_blacks); 
+        return state_black;
+    }
+    
+
     //Muestra la cantidad de fichas por color
-    const state_white = document.createElement('div');
-    state_white.style.padding = '5px';
-    state_white.style.display = 'flex';
-    state_white.style.flexDirection = 'row';
-    const whites = document.createElement('h3');
-    whites.innerText = "Cant. Blancas:"
-    const c_whites = document.createElement('h3');
-    c_whites.innerText = cuenta_blancas;
-    c_whites.style.paddingLeft = '5px';
-    whites.style.paddingLeft = '25px';
-
-    state_white.appendChild(whites);
-    state_white.appendChild(c_whites);
-
-
-    const state_black = document.createElement('div');
-    state_black.style.padding = '5px';
-    state_black.style.display = 'flex';
-    state_black.style.flexDirection = 'row';
-    const blacks = document.createElement('h3');
-    blacks.innerText = "Cant. Negras:"
-    const c_blacks = document.createElement('h3');
-    c_blacks.innerText = cuenta_negras;
-    c_blacks.style.paddingLeft = '5px';
-    blacks.style.paddingLeft = '75px';
+    const render_estado_de_juego = () =>{
+        const state_game = document.createElement('div');
+        state_game.style.minWidth = '410px';
+        state_game.display = 'flex';
+        state_game.style.flexDirection = 'row';
+        state_game.style.alignItems = 'center';
+        state_game.style.backgroundColor = '#ecd67b';
+        state_game.style.borderStyle = 'dashed';
+        state_game.style.borderSize = '2px';
+        state_game.appendChild(render_estado_whites());
+        state_game.appendChild(render_estado_blacks());
+        state_game.appendChild(render_turno());
+        return state_game;
+    }
 
     //Muestra el turno del jugador
-    const info_turno = document.createElement('div');
-    info_turno.style.alignItems = 'center';
-    info_turno.style.display = 'flex';
-    info_turno.style.flexDirection = 'row';
-    const turno_turno = document.createElement('h2');
-    const turno_player = document.createElement('h2');
-    turno_turno.style.paddingLeft = '100px';
-    turno_player.style.paddingLeft = '25px';
+    const render_turno = () =>{
+        const info_turno = document.createElement('div');
+        info_turno.style.alignItems = 'center';
+        info_turno.style.display = 'flex';
+        info_turno.style.flexDirection = 'row';
+        const turno_turno = document.createElement('h2');
+        const turno_player = document.createElement('h2');
+        turno_turno.style.paddingLeft = '100px';
+        turno_player.style.paddingLeft = '25px';
 
-    const player_turn = (Turn) ? 'Jugador 1' : 'Jugador 2';
+        const player_turn = (Turn) ? 'Jugador 1' : 'Jugador 2';
 
-    turno_turno.innerText = "Turno:";
-    turno_player.innerText = player_turn;
+        turno_turno.innerText = "Turno:";
+        turno_player.innerText = player_turn;
 
-    info_turno.appendChild(turno_turno);
-    info_turno.appendChild(turno_player);
+        info_turno.appendChild(turno_turno);
+        info_turno.appendChild(turno_player);
+        
+        return info_turno; 
+    }
 
-    state_white.appendChild(blacks);
-    state_white.appendChild(c_blacks);
-
-    state_game.appendChild(state_white);
-    state_game.appendChild(info_turno);
-    state_game.appendChild(state_black);
-
-    info.appendChild(title);
-    info.appendChild(state_game);
+    info.appendChild(render_titulo());
+    info.appendChild(render_estado_de_juego());
 
     //Muestra el tablero
-    const tablero = document.createElement('div');
-    tablero.style.backgroundColor = '#00b75b';
-    tablero.style.width = '410px';
-    tablero.style.margin = '10px';
-    tablero.style.padding = '25px';
-    tablero.style.borderRadius = '5px';
+    const render_tablero = () =>{
+        const tablero = document.createElement('div');
+        tablero.style.backgroundColor = '#00b75b';
+        tablero.style.width = '410px';
+        tablero.style.margin = '10px';
+        tablero.style.padding = '25px';
+        tablero.style.borderRadius = '5px';
 
-    state.Board.map((fila, iFila) => fila.map((celda, iColumna) => renderCasilla({celda, iFila, iColumna, root, APP_STATE})).forEach(casilla => tablero.appendChild(casilla)));
+        state.Board.map((celda, indice) => renderCasilla({celda, indice})).forEach(casilla => tablero.appendChild(casilla));
+        return tablero;
+    }
     
-    info.appendChild(tablero);
+    
+    info.appendChild(render_tablero());
     mount.appendChild(info);
     
 };
@@ -242,14 +270,14 @@ const render = (mount, state) => {
 const APP_STATE = {
     Turn: true,
     Board: [
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,-1,1,0,0,0],
-            [0,0,0,1,-1,0,0,0],
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0,0],
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,-1,1,0,0,0,
+            0,0,0,1,-1,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
+            0,0,0,0,0,0,0,0,
             ],
 }
 
